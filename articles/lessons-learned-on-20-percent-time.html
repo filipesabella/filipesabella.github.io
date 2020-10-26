@@ -1,0 +1,337 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Lessons Learned on 20% Time</title>
+
+  <style>
+    body {
+      font-size: 21px;
+      max-width: 35em;
+      padding: 1em;
+      margin: auto;
+      font-family: Roboto, Arial, Helvetica, sans-serif;
+      color: #222;
+      counter-reset: h1counter;
+    }
+
+    h1 {
+      counter-reset: h2counter;
+    }
+
+    h1:first-child {
+      margin-top: 0;
+    }
+
+    h1:before {
+      counter-increment: h1counter;
+      content: counter(h1counter) ".\0000a0";
+    }
+
+    h2:before {
+      counter-increment: h2counter;
+      content: counter(h1counter) "."counter(h2counter) ".\0000a0";
+    }
+
+    h2.no-number:before {
+      counter-increment: none;
+      content: '';
+    }
+
+    p {
+      line-height: 1.5em;
+    }
+
+    h1,
+    h2 {
+      margin-top: 1em;
+      margin-bottom: .5em;
+    }
+
+    h1 {
+      font-size: 1.75em;
+    }
+
+    h2 {
+      font-size: 1.25em;
+    }
+
+    h1+p,
+    h2+p {
+      margin-top: 0;
+    }
+
+    li {
+      padding: .25em 0;
+    }
+
+    li:first-child {
+      padding-top: 0;
+    }
+
+  </style>
+</head>
+
+<body>
+  <h1>Introduction</h1>
+  <p>"x-percent-time" is the benefit some companies provide their employees, in
+    which an individual is allowed, usually on a weekly basis, to spend that
+    amount of time doing something else other than their usual backlog work.</p>
+
+  <p>During my time at SoundCloud, the company had a 20% time rule for
+    engineers.
+    In short, it meant that every engineer was allowed to work one day per week
+    on
+    whatever they wanted.</p>
+
+  <p>The use of the word "whatever" in the previous sentence was carefully
+    thought
+    out. When I joined the company, there was a very short document with a
+    handful
+    of examples of what were good examples of how to spend that time, and that
+    was
+    all.</p>
+
+  <p>In this article, I am going to describe the problems we had with the
+    process,
+    and what we did to get it to good shape.</p>
+
+  <h1>Benefits</h1>
+  <p>When asking around about it, I remember many engineers mentioning that this
+    was one of the reasons they stayed in the company. We learned that this
+    benefit, when applied correctly, can be a big retention factor.</p>
+
+  <p>Every other possible benefit really does depend on how you organise it, and
+    what activities engineers engage on during this time. It can be learning,
+    actually producing useful prototypes, give time for the teams to think
+    outside
+    of the box, etc.</p>
+
+  <h1>Problems</h1>
+  <p>The following were the most common problems we found with the
+    already-in-place process.</p>
+  <p>The goal here is to share possibly common pitfalls, regardless of how your
+    context is configured.</p>
+
+  <h2>Lack of engagement</h2>
+  <p>Some people used it every week, however most people didn’t use it at all.
+  </p>
+  <p>We didn’t spend enough time to understand all the underlying reasons for
+    this, however a few were more apparent:</p>
+  <ol>
+    <li>People felt pressured to do backlog work instead of working on something
+      else.</li>
+    <li>Managers didn’t promote it well enough within the teams.</li>
+  </ol>
+
+  <h2>Lack of accountability</h2>
+  <p>Given the free format, most people worked on "random" things that, most
+    times, didn’t have a tangible output. "I’m going to play with this new
+    technology", "I’m going to read more about this library".</p>
+
+  <p>No tracking of the work was done in terms of cards in the backlog, or a
+    demo
+    to the team, etc.</p>
+
+  <p>While this is not inherently bad, it does challenge the usefulness of
+    the
+    time spent.</p>
+
+  <p>This lack of accountability led to a few issues in which it became
+    painfully
+    obvious that, in some cases, people were taking their 20% to escape work for
+    a
+    day once in a while. In these cases, people would usually work from home,
+    despite the company not having this culture at the time.</p>
+  <p>Since this benefit was given to all engineers, teams felt powerless to try
+    and fix it.</p>
+
+  <h2>Didn’t promote cross-team or department collaboration</h2>
+  <p>Since people took their days randomly throughout the week, and many times
+    telling their teams the night before, there wasn’t much collaboration on
+    projects across teams coming out of it. It happened from time to time, but
+    too
+    sparsely to count.</p>
+
+  <h2>Creating work for other teams</h2>
+  <p>On many occasions, mostly from old-timers, someone would go rogue and fix
+    or
+    implement features on systems that were taken care of by another team,
+    without
+    communicating before starting the work.</p>
+
+  <p>That ended badly in one of two ways:</p>
+  <ol>
+    <li>The team takes on the maintenance work of what was produced, having to
+      shuffle priorities, or</li>
+    <li>The team rejected the work.</li>
+  </ol>
+
+  <h2>Promoting to production</h2>
+  <p>Spikes and prototypes sometimes were deemed good and that they should go to
+    production.</p>
+  <p>How to do it? Which team is going to change priorities to make it
+    production
+    ready and ship it?</p>
+
+  <h2>Cheating on backlog priorities</h2>
+  <p>Surprisingly, this was one of the top complaints from teams. An engineer
+    wouldn’t agree with the team’s prioritisation of the backlog for a given
+    sprint, so would use their 20% time to "cheat", and work on something that
+    had
+    been deprioritised, instead of making their point and committing as a team.
+  </p>
+
+  <h2>Overall</h2>
+  <p>As you might have concluded, many of these problems could, most likely,
+    have
+    been prevented by a more mature leadership team. This lack of maturity
+    paired
+    with a strong-willed engineering culture, which is a good thing, led to
+    these
+    problems persisting for a few years.</p>
+
+  <h1>Fixing it</h1>
+  <p>When the engineering management team started to grow at SoundCloud (a tale
+    for another time), the issues described previously started to become a
+    recurring topic. Also, during engineering retrospectives, engineers
+    themselves
+    became more vocal about the problems.</p>
+
+  <p>Eventually we got to focus our attention on fixing it.</p>
+
+  <p>The hottest topic was what should be allowed during the 20% time.</p>
+  <p>After many interviews and meetings, we reached the conclusion that pursuing
+    an "allow-list" of topics was an unfruitful endeavour. With over a hundred
+    engineers in dozens of teams, contexts were too different, it wouldn’t work.
+  </p>
+
+  <p>Instead, following the overall leadership style of Richard Durnwall at the
+    time, we decided on a very small set of rules that mainly promoted in-team
+    decision making.</p>
+
+  <p>The rules were as follows:</p>
+
+  <h2 class="no-number">1. Must be done in the office, every Friday</h2>
+  <p>This aimed to address accountability, cross-team collaboration, and it also
+    helped to increase awareness to the other departments, since everyone knew
+    that Friday was 20%-time day.</p>
+
+  <h2 class="no-number">2. A card must be put in the backlog during sprint
+    planning</h2>
+  <p>Since all teams organised their work in two-week sprints, and those were
+    all
+    synchronised throughout the company, this rule made sense.</p>
+
+  <p>The goal was also to increase accountability, as the cards had to move
+    through the pipeline, and eventually be marked as done.</p>
+
+  <h2 class="no-number">3. Any team member can veto any suggestion</h2>
+  <p>This one was very contentious, and my introduction to how hard it is to do
+    mass-communication over documents. I remember spending an afternoon having
+    conversations with the authors of many of the fifty-something comments on
+    the
+    one-page document’s sidebar.</p>
+
+  <p>The goal of this rule was to give an opportunity to any team member to
+    challenge an activity. In the end, naturally, no one ever used it (we
+    asked),
+    but it just stated clearly that 20% time was also about the team, that
+    backlog
+    priorities shouldn’t be cheated, that one shouldn’t work on something that
+    would create work to another group.</p>
+
+  <p>It also gave the opportunity for team members to collaborate on something.
+  </p>
+
+  <h2 class="no-number">Name rebrand</h2>
+  <p>The previous unofficial, but widely used name, for 20% was "Hacker Time".
+    We
+    felt that this wasn’t incredibly inclusive given all the possibilities of
+    usage of this time. </p>
+  <p>Also in hopes of increasing awareness and thus, engagement, we renamed it
+    to
+    something not very good, but that stuck to this day: <strong>Self-Allocated
+      Time</strong>, or SAT for short.</p>
+
+  <p>Not the most eloquent idea, but it did the trick.</p>
+
+  <h1>Learnings</h1>
+  <p>The most important one was that <strong>no process will save you from
+      lacking
+      management skills</strong>.</p>
+
+  <p>And the other one was to <strong>trust teams to make decisions that affect
+      their context, but provide guidelines</strong>.</p>
+
+  <p>I would also strongly recommend <strong>against</strong> using this time to
+    pay off technical debt. This kind of work must be accounted for using your
+    team’s normal planning methods.</p>
+
+  <h1>Criticism</h1>
+  <p>At the time, when we were working on changing Hacker Time, one person was
+    vocal about abolishing all together.</p>
+  <p>Their argument was that whatever is done in 20% time should actually be
+    organised as normal work or a particular activity.</p>
+
+  <p>Leaning new tech? Should have workshops and such.</p>
+  <p>Prototypes? Should be organised as normal work.</p>
+  <p>Spiking out new approaches? Also planned as normal.</p>
+
+  <p>While I do agree that they were absolutely correct, my counter-argument at
+    the time was that we were not mature enough as an organisation to have that
+    time planned out correctly for every activity and team.</p>
+  <p>20% time was a kind of safety net for activities that
+    <strong>should</strong>
+    be organised, <strong>but weren’t</strong>. At the same time providing
+    engineers with more autonomy.</p>
+
+  <h1>At SoundCloud</h1>
+  <p>Disclaimer: I left the company in 2017, a little over two years ago now.
+  </p>
+
+  <p>When new engineers joined the company, most would use their first few weeks
+    of SAT to learn Scala, the programming language used in most product teams
+    at
+    the time.</p>
+
+  <p>Other than this, most would use it to play with and learn new technologies,
+    spike out new technical approaches, or pay some old ownerless technical
+    debt.
+  </p>
+
+  <h1>Conclusion: should you do it?</h1>
+  <p>When I joined SoundCloud, Hacker Time had already been in place for a few
+    years. I couldn’t really imagine the engineering team without this benefit,
+    and they do it to this day.</p>
+
+  <p>If you are to try it out, definitely do it as an experiment, with a start
+    and
+    end date.</p>
+
+  <p>You will have to convince other stakeholders that this is useful in some
+    way.
+    Agree with them what is the expected output of the experiment, and try it
+    out.
+  </p>
+
+  <a href="/">Go back</a>
+  </p>
+</body>
+
+<script>
+  (function (i, s, o, g, r, a, m) {
+    i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {
+      (i[r].q = i[r].q || []).push(arguments)
+    }, i[r].l = 1 * new Date(); a = s.createElement(o),
+      m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m)
+  })(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
+
+  ga('create', 'UA-2386530-2', 'auto');
+  ga('send', 'pageview');
+</script>
+
+</html>

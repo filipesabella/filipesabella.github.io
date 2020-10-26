@@ -1,0 +1,368 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Setting up an on-call rotation</title>
+
+  <style>
+    body {
+      font-size: 21px;
+      max-width: 35em;
+      padding: 1em;
+      margin: auto;
+      font-family: Roboto, Arial, Helvetica, sans-serif;
+      color: #222;
+      counter-reset: h1counter;
+    }
+
+    h1 {
+      counter-reset: h2counter;
+    }
+
+    h1:first-child {
+      margin-top: 0;
+    }
+
+    h1:before {
+      counter-increment: h1counter;
+      content: counter(h1counter) ".\0000a0";
+    }
+
+    h2:before {
+      counter-increment: h2counter;
+      content: counter(h1counter) "."counter(h2counter) ".\0000a0";
+    }
+
+    p {
+      line-height: 1.5em;
+    }
+
+    h1,
+    h2 {
+      margin-top: 1em;
+      margin-bottom: .5em;
+    }
+
+    h1 {
+      font-size: 1.75em;
+    }
+
+    h2 {
+      font-size: 1.25em;
+    }
+
+    h1+p,
+    h2+p {
+      margin-top: 0;
+    }
+
+    li {
+      padding: .25em 0;
+    }
+
+    li:first-child {
+      padding-top: 0;
+    }
+
+  </style>
+</head>
+
+<body>
+  <h1>Introduction</h1>
+  <p>Having been part of a reformulation of on-call in two different companies
+    now, there are a few tips that came from many iterations, trying out
+    different formats, until we found one that had a good balance between
+    well-being and on-call quality.</p>
+  <h1>What is on-call?</h1>
+  <p>Let us define on-call for the scope of this article.</p>
+
+  <p>On-call is the act of an engineer being available to respond immediately to
+    service malfunction, at any time, any day of the year.</p>
+  <p>It usually entails some sort of automatic alerting system, paired with a
+    way to notify the engineer.</p>
+
+  <p>For alerting, I’m more familiar with Prometheus’ Alert Manager, and for
+    notifying, both PagerDuty and OpsGenie. It is outside of the scope of this
+    article to discuss these technologies.</p>
+
+  <p>As for the engineers, it is expected that they are able to respond; that
+    is, they have the necessary tools at hand, like internet access and a
+    laptop, and are able-minded.</p>
+
+  <p>There are other models for this. Notably, companies that have a team of
+    people, normally called SREs, that are on-call for every system.</p>
+  <h1>How to define Quality for on-call?</h1>
+  <p>For this article, let us define it as such: good quality on-call means that
+    the engineer who responds has access to the necessary knowledge,
+    documentation, and tools to restore service quickly.</p>
+
+  <p>With that in mind, it would be natural to assume that the most adequate
+    group of people to be on-call for a set of services is the same group who
+    builds and maintains them.</p>
+
+  <p>However, more often than not, teams are formed by two to eight people,
+    which means that they would be on-call many days out of a month. Which leads
+    to the next point.</p>
+  <h1>Being on-call is not an enjoyable activity</h1>
+  <p>Even in the unlikely case that your company produces software that never
+    malfunctions, the fact of being essentially trapped in your own home, having
+    to bring your work phone to the bathroom, not being able to have some wine,
+    and knowing that, at any point, you might be woken up with the dreadful,
+    extremely loud sound of the pager, is not fun.</p>
+  <p>I have been woken up in the middle of the night a few times. Full of
+    adrenaline, already reaching for the laptop. Going back to sleep afterwards
+    is challenging.</p>
+  <p>Given that, it seems to be a desirable goal to have engineers on-call as
+    few times per month as possible.</p>
+
+  <p>But how to pair that up with quality?</p>
+  <h1>Making trade-offs</h1>
+  <p>To reduce the amount of time on-call, it is necessary to have more people
+    in the rotation.</p>
+  <p>Apart from making teams larger than intended, the only possible way is to
+    have multiple teams to be on-call for all the systems in the pool, meaning
+    that the people on-call don’t necessarily participate in maintaining the
+    systems that can alert.</p>
+
+  <p><strong>This leads to anxiety</strong>. How can I be on-call for a system I
+    don’t know?</p>
+
+  <p>The following are the prerequisites to make this possible.</p>
+
+  <h2>Monitoring & Tools</h2>
+  <p>Without proper monitoring it is impossible to achieve this goal. You
+    <strong>must</strong> have comprehensible dashboards and troubleshooting
+    tools.</p>
+
+  <h2>Documentation</h2>
+  <p>No alert should be created without a <strong>very thorough
+    </strong>runbook.</p>
+
+  <p>Runbooks should be created and tested with engineers outside of the team.
+    When someone writes a runbook, they will inadvertently make assumptions
+    about the knowledge of the engineer reading it. “Connect to the production
+    server” might mean nothing to someone else.</p>
+
+  <p>Remember that the person reading the runbook is under a high-stress
+    situation. They are worried and agitated. The last thing they need is to
+    find out that the links in the runbook lead to nowhere.</p>
+
+  <p>A runbook starts with a link to the relevant dashboard showing the data
+    that triggered the alert.</p>
+  <p>Then, it lists instructions, with IPs, bash commands, etc, to troubleshoot
+    and restore service.</p>
+
+  <h2>Absolutely no flaky alerts</h2>
+  <p>When a team is on-call for their own systems, they know that some alerts
+    are a little flaky. “This one always fires on Friday evenings and it
+    auto-heals in three minutes”, or “This one always fires when a deploy
+    happens”. They happily acknowledge the page and go back to whatever they
+    were doing.</p>
+
+  <p>These absolutely cannot happen when you have shared on-call
+    responsibilities. The next engineer won’t know that this is the case. They
+    will wake up, open their laptops, just to find the alert already resolved.
+    Not a good way to make friends.</p>
+  <h1>Configuring the rotation</h1>
+
+  <h2>Days of the week</h2>
+  <p>There are many possible configurations, with weekly or daily rotations
+    being popular.</p>
+  <p>After many iterations and retrospectives, it was concluded, unsurprisingly,
+    that people care way more about their weekends than week-days.</p>
+
+  <p>Given that, my recommended setup is five shifts per week, which result to
+    the following amount of hours on-call outside of the normal 8h in the
+    office:</p>
+  <ul>
+    <li>Monday-Tuesday: 32h</li>
+    <li>Wednesday-Thursday: 32h</li>
+    <li>Friday: 16h</li>
+    <li>Saturday: 24h</li>
+    <li>Sunday: 24h</li>
+  </ul>
+
+  <p>Usually shifts start at the time most engineers are in the office, let’s
+    say 10am, and finish 10am the next day (or two depending on the shift).</p>
+
+  <p>That means five different people are necessary to fill-up all shifts for a
+    week’s worth of on-call.</p>
+
+  <h2>Two-layers, primary and best-effort</h2>
+  <p>I imagine most tools provide a way to have a multi-layered on-call
+    rotation.</p>
+
+  <p>My recommended configuration is as follows:</p>
+  <ol>
+    <li>Primary rotation with everybody in the pool:</li>
+    <ul>
+      <li>Mandatory</li>
+      <li>Only one person at a time</li>
+    </ul>
+    <li>Secondary rotation with all the engineers <strong>from the team that
+        owns the alert</strong></li>
+    <ul>
+      <li>Best-effort: it is not expected that the people in this rotation are
+        available and ready to respond</li>
+      <li>If a page reaches this rotation, everyone in it gets paged at the same
+        time</li>
+    </ul>
+  </ol>
+
+  <p>With this configuration, let’s say that the Primary engineer gets paged,
+    follows the runbook, but is unable to restore service. When they escalate
+    the page, it will notify <strong>all </strong>members of the secondary
+    rotation.</p>
+
+  <p>The fact that the secondary rotation is best effort can make people
+    nervous. What if no one is able to respond?</p>
+  <p>We definitely shared this concern, however, after actual experimentation
+    and hundreds and hundreds of pages, not once we had issues with the
+    secondary layer not responding.</p>
+  <h1>Implementing it</h1>
+  <p>Assuming that your company already has on-call rotations in place,
+    usually one per team, my recommendation is to <strong>start
+      small</strong>.</p>
+
+  <p>First, pick two teams to merge and talk it through. If the teams have
+    some intersection in context, it might be a little easier.</p>
+
+  <p>Then, get your hands on some alerting statistics: how many alerts per
+    month, how many outside working hours. If you can, find out how many
+    auto-resolved.</p>
+  <p>With this data in hand, have the two teams clean up the alerts: remove
+    some, fine-tune others. <strong>Definitely write runbooks for all of
+      them.</strong></p>
+
+  <p>Also, this might be a good moment to read, or reread, Rob Ewaschuk's
+    excellent
+    <a
+       href="https://docs.google.com/document/d/199PqyG3UsyXlwieHaqbGiWVa8eMWi8zzAn0YfcApr8Q">
+      Philosophy on Alerting</a> at Google. I have found that most
+    teams have, at most, four to five critical alerts that should wake people
+    in the middle of the night, many times less than that.</p>
+  <p>In general, critical alerts should point to symptoms that affect users,
+    not simply elevated error rates or backlogging in a given service.</p>
+
+  <p>With the alerts cleaned-up, it is time to configure the rotation.</p>
+  <p>For the first week or two, to get people a little more confident, you can
+    still keep the per-team mandatory rotation, but have the alerts first
+    route to the merged rotation.</p>
+
+  <p>As the teams get more comfortable, and hopefully happier with the new
+    setup, you can slowly add teams to the rotation until you reach either
+    every engineer in the company, or a good-enough size. If you have twenty
+    people in the rotation, a person would be on-call only one shift per
+    month.</p>
+
+  <p>I also <strong>strongly recommend</strong> that you book a monthly
+    retrospective with all the engineers in the merged rotation, at which you
+    also share alert statistics. Failure to do this can lead to unnecessary
+    unhappiness as I found out.</p>
+
+  <p>It is also important to have a channel in which all the engineers in the
+    rotation are. This is important to discuss current alerts, poke people for
+    missing runbooks, rage about the flaky alert that woke you up last night,
+    and to negotiate shift swaps.</p>
+
+  <h2>Onboarding new engineers on the rotation</h2>
+  <p>My recommended way to calm down the anxiety of a new person joining the
+    rotation is the following:</p>
+  <ol>
+    <li>Remind them that the objective of the person on-call is to
+      <strong>restore service</strong>. It is not to fix underlying bugs,
+      understand the whole architecture, etc. Simply follow the runbook, and
+      if it doesn’t restore service, escalate the page.</li>
+    <li>Explain to them that they are <strong>not </strong>expected to be
+      online, checking messages and emails. They are expected to respond to an
+      automatically triggered alert.</li>
+    <li>Grab an old alert that happened a few days ago, have them follow the
+      instructions in the runbook, show the dashboards at the time of the
+      event.</li>
+    <li>And finally, add them to the channel and the rotation.</li>
+  </ol>
+  <h1>Common problems</h1>
+
+  <h2>Alerts during work-hours</h2>
+  <p>This is a surprisingly difficult problem to solve: when people are in the
+    office, alert the owning team instead of the shared rotation.</p>
+  <p>Despite the fact that the tools I have used to have some configurations
+    around time, not one has local holiday calendar support. Unless you are
+    willing to have to remember to update the configuration manually for
+    those, you might end-up with alerts only routing the best-effort
+    layer.</p>
+
+  <h2>Flaky alerts</h2>
+  <p>These are the bane of the shared on-call. People get unsurprisingly and
+    rightfully upset when those happen. It is paramount that the leaders of each
+    team take time to fine-tune flaky alerts as soon as possible, immediately or
+    the very next day.</p>
+
+  <h2>A particular team has too much specific knowledge</h2>
+  <p>Sometimes, a team is too far away in technology from the others, making
+    writing runbooks nearly impossible.</p>
+
+  <p>This, however, can be a symptom of an underlying problem that, perhaps,
+    should
+    be addressed.</p>
+
+  <p>In my experience, when trying to implement this, some teams will claim that
+    it
+    is the case. Analyse each with care and work with the team to understand if
+    it
+    is the moment to make foundational changes or not.</p>
+
+  <p>If not, the team should carry on with their own rotation.</p>
+
+
+  <h2>Too many alerts for a given team</h2>
+  <p>If one team causes alerts a disproportionate amount when compared to the
+    others, people will get bitter. It is possible to set “maximum quotas” per
+    team, per month, and in the case they are exceeded, the team reverts back
+    to local on-call duties.</p>
+
+  <p>I don’t have experience with this, but this possibility has been
+    contemplated in the past. Managing the shared on-call morale is important.
+  </p>
+
+  <h2>Adding and removing people from the rotation</h2>
+  <p>Both PagerDuty and OpsGenie don’t do an amazing job at keeping the
+    existing schedule when adding or removing people from the rotation. It
+    seems to be a difficult problem to solve given the infinite nature of
+    on-call schedules.</p>
+  <p>Remember to announce these changes in the rotation channel, so that
+    people can check if anything has changed.</p>
+  <h1>Good side-effects</h1>
+  <p>As rotations evolve over time, I have observed some beneficial
+    side-effects apart from personal well-being and on-call quality:</p>
+  <ul>
+    <li>Better alerts</li>
+    <li>Better dashboards</li>
+    <li>Better runbooks</li>
+    <li>More homogeneous technology across the company</li>
+  </ul>
+
+  <p>And, most importantly, <strong>better systems</strong>, that alert less
+    and self-heal in more cases.</p>
+
+  <p>
+    <a href="/">Go back</a>
+  </p>
+</body>
+
+<script>
+  (function (i, s, o, g, r, a, m) {
+    i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {
+      (i[r].q = i[r].q || []).push(arguments)
+    }, i[r].l = 1 * new Date(); a = s.createElement(o),
+      m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m)
+  })(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
+
+  ga('create', 'UA-2386530-2', 'auto');
+  ga('send', 'pageview');
+</script>
+
+</html>
