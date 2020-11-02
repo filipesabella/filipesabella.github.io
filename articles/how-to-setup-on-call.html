@@ -99,9 +99,16 @@
   <p>There are other models for this. Notably, companies that have a team of
     people, normally called SREs, that are on-call for every system.</p>
   <h1>How to define Quality for on-call?</h1>
-  <p>For this article, let us define it as such: good quality on-call means that
-    the engineer who responds has access to the necessary knowledge,
-    documentation, and tools to restore service quickly.</p>
+
+  <p>Two primary metrics can track the quality of an on-call rotation:
+    <strong>Mean Time
+      To Acknowledge</strong> (MTTA) and <strong>Mean Time To Resolve</strong>
+    (MTTR).</p>
+
+  <p>The first one tracks how quickly an engineer acknowledges a page, and it
+    reveals how healthy a given rotation is. The other tracks how quickly an
+    acknowledged page is resolved; it shows how good the tooling and
+    documentation are. </p>
 
   <p>With that in mind, it would be natural to assume that the most adequate
     group of people to be on-call for a set of services is the same group who
